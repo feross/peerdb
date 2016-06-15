@@ -1,0 +1,43 @@
+{
+  "name": "peerdb",
+  "description": "TODO",
+  "version": "0.0.0",
+  "author": {
+    "name": "Feross Aboukhadijeh",
+    "email": "feross@feross.org",
+    "url": "http://feross.org/"
+  },
+  "bugs": {
+    "url": "https://github.com/feross/peerdb/issues"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "standard": "^6.0.4",
+    "tape": "^4.0.0",
+    "zuul": "^3.0.0"
+  },
+  "homepage": "https://github.com/feross/peerdb",
+  "keywords": [
+    "magnet",
+    "uri",
+    "urn",
+    "p2p",
+    "peer-to-peer",
+    "cryptolinks",
+    "bittorrent",
+    "webtorrent"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/feross/peerdb.git"
+  },
+  "scripts": {
+    "test": "standard && npm run test-node && npm run test-browser",
+    "test-browser": "zuul -- test/*.js",
+    "test-browser-local": "zuul --local -- test/*.js",
+    "test-node": "tape test/*.js"
+  }
+}
