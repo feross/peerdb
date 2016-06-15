@@ -1,7 +1,7 @@
 {
   "name": "peerdb",
   "description": "TODO",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "author": {
     "name": "Feross Aboukhadijeh",
     "email": "feross@feross.org",
@@ -10,8 +10,7 @@
   "bugs": {
     "url": "https://github.com/feross/peerdb/issues"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "standard": "^6.0.4",
     "tape": "^4.0.0",
