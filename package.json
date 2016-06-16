@@ -10,21 +10,26 @@
   "bugs": {
     "url": "https://github.com/feross/peerdb/issues"
   },
-  "dependencies": {},
+  "dependencies": {
+    "once": "^1.3.3",
+    "webtorrent": "^0.95.1"
+  },
   "devDependencies": {
-    "standard": "^6.0.4",
-    "tape": "^4.0.0",
-    "zuul": "^3.0.0"
+    "standard": "^7.1.2",
+    "tape": "^4.5.1",
+    "zuul": "^3.10.1"
   },
   "homepage": "https://github.com/feross/peerdb",
   "keywords": [
-    "magnet",
-    "uri",
-    "urn",
+    "db",
+    "database",
+    "serverless",
     "p2p",
+    "peer to peer",
     "peer-to-peer",
-    "cryptolinks",
-    "bittorrent",
+    "peer assisted delivery",
+    "cdn",
+    "web seed",
     "webtorrent"
   ],
   "license": "MIT",
