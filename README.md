@@ -39,10 +39,10 @@ It's super easy to store data:
 ```js
 var db = require('peerdb')
 
-db.put(Buffer('some data'), function (err, id) {
-  // `id` is a unique identifier based on the data (content-addressed)
-  db.get(id, function (err, data) {
-    console.log(data) // 'some data'
+db.put(Buffer('some data'), function (err, key) {
+  // `key` is a unique identifier based on the data (content-addressed)
+  db.get(key, function (err, value) {
+    console.log(value) // 'some data'
   })
 })
 ```
@@ -57,14 +57,14 @@ db.setup({
   apiKey: '...'
 })
 
-db.put(Buffer('some data'), function (err, id) {
-  // `id` is a unique identifier based on the data (content-addressed)
-  db.get(id, function (err, data) {
-    console.log(data) // 'some data'
+db.put(Buffer('some data'), function (err, key) {
+  // `key` is a unique identifier based on the data (content-addressed)
+  db.get(key, function (err, value) {
+    console.log(value) // 'some data'
 
     // Data can be deleted from the central server and the local database
-    db.del(id, function (err) {
-      // Data is
+    db.del(key, function (err) {
+      // Data is deleted!
     })
   })
 })

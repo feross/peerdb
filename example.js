@@ -20,9 +20,17 @@ if (typeof window !== 'undefined') {
 var drop = require('drag-drop')
 
 drop('body', function (files) {
+  console.log('drop!')
   peerdb.put(files[0], function (err, key) {
     if (err) throw err
-    window.location.hash = key
+    console.log('put value as key: ' + key)
   })
 })
 
+document.querySelector('html').style.width = '100%'
+document.querySelector('html').style.height = '100%'
+document.querySelector('html').style.margin = '0'
+
+document.querySelector('body').style.width = '100%'
+document.querySelector('body').style.height = '100%'
+document.querySelector('body').style.margin = '0'

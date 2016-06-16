@@ -1,16 +1,19 @@
 module.exports = PeerDB
 
+var concat = require('simple-concat')
+var crypto = require('./lib/crypto')
 var magnet = require('magnet-uri')
 var once = require('once')
 var parallel = require('run-parallel')
+var pump = require('pump')
+var stream = require('readable-stream')
+var toStream = require('./lib/to-stream')
 var WebTorrent = require('webtorrent')
 var xhr = require('xhr')
 
 var ANNOUNCE = 'wss://tracker.webtorrent.io'
 var TIMEOUT = 20000
-var UPLOAD_URL = typeof window !== 'undefined' && window.location.hostname
-  ? 'http://localhost:9200/uploads/'
-  : 'http://peerdb.io/uploads/'
+var UPLOAD_URL = 'http://peerdb.io/uploads/'
 
 function PeerDB () {
   this.destroyed = false
@@ -57,12 +60,13 @@ PeerDB.prototype.put = function (value, cb) {
     name: 'PeerDB User Data'
   }
 
-  var torrent = this._client.seed(value, opts)
+  var valueStream = toStream(value)
+  var cipher = crypto.createCipher()
 
-  torrent.once('error', function (err) {
-    cb(err)
-  })
+  var cipherStream = pump(valueStream, cipher, onError)
 
+  var torrent = this._client.seed(cipherStream, opts)
+  torrent.once('error', onError)
   torrent.once('seed', onSeed)
 
   function onSeed () {
@@ -99,9 +103,13 @@ PeerDB.prototype.put = function (value, cb) {
           })
         }
       ], function (err) {
-        cb(err, torrent.infoHash)
+        cb(err, torrent.infoHash + ':' + cipher.key.toString('hex'))
       })
     })
+  }
+
+  function onError (err) {
+    if (err) cb(err)
   }
 }
 
@@ -109,6 +117,14 @@ PeerDB.prototype.get = function (key, cb) {
   this._checkOpen()
   if (!cb) cb = noop
   cb = once(cb)
+
+  var parts = key.split(':')
+  key = parts[0]
+  var cipherKey = parts[1]
+
+  if (cipherKey) {
+    cipherKey = Buffer(cipherKey, 'hex')
+  }
 
   var torrent = this._client.get(key)
   if (!torrent) {
@@ -138,10 +154,22 @@ PeerDB.prototype.get = function (key, cb) {
   }, TIMEOUT)
 
   function onReady (torrent) {
-    torrent.files[0].getBuffer(function (err, value) {
+    torrent.files[0].getBuffer(function (err, cipherText) {
       clearTimeout(timeout)
-      cb(err, value)
+      if (err) return cb(err)
+
+      var readable = stream.PassThrough()
+      readable.end(cipherText)
+      var decipher = crypto.createDecipher(cipherKey)
+
+      var decipherStream = pump(readable, decipher, onError)
+
+      concat(decipherStream, cb)
     })
+  }
+
+  function onError (err) {
+    if (err) cb(err)
   }
 }
 

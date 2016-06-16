@@ -11,16 +11,24 @@
     "url": "https://github.com/feross/peerdb/issues"
   },
   "dependencies": {
+    "browserify-aes": "^1.0.6",
+    "filestream": "^4.1.3",
     "magnet-uri": "^5.1.3",
     "once": "^1.3.3",
+    "pump": "^1.0.1",
+    "randombytes": "^2.0.3",
+    "readable-stream": "^2.1.4",
     "run-parallel": "^1.1.6",
+    "simple-concat": "^1.0.0",
     "webtorrent": "^0.95.1",
     "xhr": "^2.2.0"
   },
   "devDependencies": {
+    "browserify": "^13.0.1",
     "hat": "0.0.3",
     "standard": "^7.1.2",
     "tape": "^4.5.1",
+    "uglify-js": "^2.6.2",
     "zuul": "^3.10.1"
   },
   "homepage": "https://github.com/feross/peerdb",
@@ -43,6 +51,7 @@
     "url": "git://github.com/feross/peerdb.git"
   },
   "scripts": {
+    "size": "browserify . | uglifyjs -c -m | gzip | wc -c",
     "test": "standard && npm run test-node && npm run test-browser",
     "test-browser": "zuul -- test/*.js",
     "test-browser-local": "zuul --local -- test/*.js",
