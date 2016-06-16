@@ -1,11 +1,16 @@
 module.exports = PeerDB
 
+var magnet = require('magnet-uri')
 var once = require('once')
+var parallel = require('run-parallel')
 var WebTorrent = require('webtorrent')
+var xhr = require('xhr')
 
-var CLIENT_OPTS = {
-  announce: 'wss://tracker.webtorrent.io'
-}
+var ANNOUNCE = 'wss://tracker.webtorrent.io'
+var TIMEOUT = 20000
+var UPLOAD_URL = typeof window !== 'undefined' && window.location.hostname
+  ? 'http://localhost:9200/uploads/'
+  : 'http://peerdb.io/uploads/'
 
 function PeerDB () {
   this.destroyed = false
@@ -47,13 +52,57 @@ PeerDB.prototype.put = function (value, cb) {
   if (!cb) cb = noop
   cb = once(cb)
 
-  this._client.seed(value, CLIENT_OPTS)
-    .once('error', function (err) {
-      cb(err)
+  var opts = {
+    announce: ANNOUNCE,
+    name: 'PeerDB User Data'
+  }
+
+  var torrent = this._client.seed(value, opts)
+
+  torrent.once('error', function (err) {
+    cb(err)
+  })
+
+  torrent.once('seed', onSeed)
+
+  function onSeed () {
+    torrent.files[0].getBuffer(function (err, buf) {
+      if (err) return cb(err)
+
+      parallel([
+        // Upload torrent data
+        function (cb) {
+          xhr({
+            method: 'POST',
+            body: buf,
+            url: UPLOAD_URL + '?key=' + torrent.infoHash
+          }, function (err, res) {
+            if (err) return cb(err)
+            if (res.statusCode !== 200) {
+              return cb('PeerDB: Upload failed with http response: ' + res.statusCode)
+            }
+            cb(null)
+          })
+        },
+        // Upload torrent metadata (.torrent file)
+        function (cb) {
+          xhr({
+            method: 'POST',
+            body: torrent.torrentFile,
+            url: UPLOAD_URL + '?key=' + torrent.infoHash + '&torrent=true'
+          }, function (err, res) {
+            if (err) return cb(err)
+            if (res.statusCode !== 200) {
+              return cb('PeerDB: Upload failed with http response: ' + res.statusCode)
+            }
+            cb(null)
+          })
+        }
+      ], function (err) {
+        cb(err, torrent.infoHash)
+      })
     })
-    .once('seed', function () {
-      cb(null, this.infoHash)
-    })
+  }
 }
 
 PeerDB.prototype.get = function (key, cb) {
@@ -63,7 +112,14 @@ PeerDB.prototype.get = function (key, cb) {
 
   var torrent = this._client.get(key)
   if (!torrent) {
-    torrent = this._client.add(key, CLIENT_OPTS)
+    var opts = {
+      infoHash: key,
+      announce: ANNOUNCE,
+      urlList: UPLOAD_URL + key,
+      xs: UPLOAD_URL + key + '.torrent'
+    }
+
+    torrent = this._client.add(magnet.encode(opts), opts)
     torrent.once('error', function (err) {
       cb(err)
     })
@@ -77,8 +133,15 @@ PeerDB.prototype.get = function (key, cb) {
     })
   }
 
+  var timeout = setTimeout(function () {
+    cb(new Error('PeerDB: key "' + key + '" not found'))
+  }, TIMEOUT)
+
   function onReady (torrent) {
-    torrent.files[0].getBuffer(cb)
+    torrent.files[0].getBuffer(function (err, value) {
+      clearTimeout(timeout)
+      cb(err, value)
+    })
   }
 }
 
@@ -109,7 +172,9 @@ PeerDB.prototype.close = function (cb) {
 }
 
 PeerDB.prototype._checkOpen = function () {
-  if (this.destroyed) throw new Error('DB is already destroyed')
+  if (this.destroyed) {
+    throw new Error('PeerDB: database is closed')
+  }
 }
 
 function noop () {}
