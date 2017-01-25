@@ -11,7 +11,7 @@ var stream = require('readable-stream')
 var toStream = require('./lib/to-stream')
 var WebTorrent = require('webtorrent')
 
-var ANNOUNCE = 'wss://tracker.webtorrent.io'
+var ANNOUNCE = 'wss://tracker.btorrent.xyz'
 var TIMEOUT = 20000
 var UPLOAD_URL = 'http://peerdb.io/uploads/'
 
@@ -23,30 +23,30 @@ function PeerDB () {
 }
 
 PeerDB._getDefaultInstance = function () {
-  if (!this._defaultInstance) {
-    this._defaultInstance = new PeerDB()
+  if (!PeerDB._defaultInstance) {
+    PeerDB._defaultInstance = new PeerDB()
   }
-  return this._defaultInstance
+  return PeerDB._defaultInstance
 }
 
 PeerDB.put = function (value, cb) {
-  var db = this._getDefaultInstance()
+  var db = PeerDB._getDefaultInstance()
   db.put(value, cb)
 }
 
 PeerDB.get = function (key, cb) {
-  var db = this._getDefaultInstance()
+  var db = PeerDB._getDefaultInstance()
   db.get(key, cb)
 }
 
 PeerDB.del = function (key, cb) {
-  var db = this._getDefaultInstance()
+  var db = PeerDB._getDefaultInstance()
   db.del(key, cb)
 }
 
 PeerDB.close = function (cb) {
-  var db = this._getDefaultInstance()
-  this._defaultInstance = null
+  var db = PeerDB._getDefaultInstance()
+  PeerDB._defaultInstance = null
   db.close(cb)
 }
 
