@@ -2,6 +2,7 @@ module.exports = PeerDB
 
 var concat = require('simple-concat')
 var crypto = require('./lib/crypto')
+var get = require('simple-get')
 var magnet = require('magnet-uri')
 var once = require('once')
 var parallel = require('run-parallel')
@@ -9,7 +10,6 @@ var pump = require('pump')
 var stream = require('readable-stream')
 var toStream = require('./lib/to-stream')
 var WebTorrent = require('webtorrent')
-var xhr = require('xhr')
 
 var ANNOUNCE = 'wss://tracker.webtorrent.io'
 var TIMEOUT = 20000
@@ -76,7 +76,7 @@ PeerDB.prototype.put = function (value, cb) {
       parallel([
         // Upload torrent data
         function (cb) {
-          xhr({
+          get.concat({
             method: 'POST',
             body: buf,
             url: UPLOAD_URL + '?key=' + torrent.infoHash
@@ -90,7 +90,7 @@ PeerDB.prototype.put = function (value, cb) {
         },
         // Upload torrent metadata (.torrent file)
         function (cb) {
-          xhr({
+          get.concat({
             method: 'POST',
             body: torrent.torrentFile,
             url: UPLOAD_URL + '?key=' + torrent.infoHash + '&torrent=true'

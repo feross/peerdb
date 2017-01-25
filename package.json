@@ -20,13 +20,13 @@
     "readable-stream": "^2.1.4",
     "run-parallel": "^1.1.6",
     "simple-concat": "^1.0.0",
-    "webtorrent": "^0.95.1",
-    "xhr": "^2.2.0"
+    "simple-get": "^2.2.1",
+    "webtorrent": "^0.95.1"
   },
   "devDependencies": {
-    "browserify": "^13.0.1",
+    "browserify": "^14.0.0",
     "hat": "0.0.3",
-    "standard": "^7.1.2",
+    "standard": "*",
     "tape": "^4.5.1",
     "uglify-js": "^2.6.2",
     "zuul": "^3.10.1"

@@ -7,8 +7,8 @@ var stream = require('readable-stream')
 test('encrypt, decrypt', function (t) {
   t.plan(2)
 
-  var cipher = crypto.getCipher()
-  var decipher = crypto.getDecipher(cipher.key)
+  var cipher = crypto.createCipher()
+  var decipher = crypto.createDecipher(cipher.key)
 
   var readable = stream.PassThrough()
 
