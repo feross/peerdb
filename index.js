@@ -83,7 +83,7 @@ PeerDB.prototype.put = function (value, cb) {
           }, function (err, res) {
             if (err) return cb(err)
             if (res.statusCode !== 200) {
-              return cb('PeerDB: Upload failed with http response: ' + res.statusCode)
+              return cb(new Error('PeerDB: Upload failed with http response: ' + res.statusCode))
             }
             cb(null)
           })
@@ -97,7 +97,7 @@ PeerDB.prototype.put = function (value, cb) {
           }, function (err, res) {
             if (err) return cb(err)
             if (res.statusCode !== 200) {
-              return cb('PeerDB: Upload failed with http response: ' + res.statusCode)
+              return cb(new Error('PeerDB: Upload failed with http response: ' + res.statusCode))
             }
             cb(null)
           })
@@ -123,7 +123,7 @@ PeerDB.prototype.get = function (key, cb) {
   var cipherKey = parts[1]
 
   if (cipherKey) {
-    cipherKey = Buffer(cipherKey, 'hex')
+    cipherKey = Buffer.from(cipherKey, 'hex')
   }
 
   var torrent = this._client.get(key)
