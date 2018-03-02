@@ -28,8 +28,7 @@
     "hat": "0.0.3",
     "standard": "*",
     "tape": "^4.5.1",
-    "uglify-js": "^2.6.2",
-    "zuul": "^3.10.1"
+    "uglify-js": "^2.6.2"
   },
   "homepage": "https://github.com/feross/peerdb",
   "keywords": [
@@ -52,9 +51,6 @@
   },
   "scripts": {
     "size": "browserify . | uglifyjs -c -m | gzip | wc -c",
-    "test": "standard && npm run test-node && npm run test-browser",
-    "test-browser": "zuul -- test/*.js",
-    "test-browser-local": "zuul --local -- test/*.js",
-    "test-node": "tape test/*.js"
+    "test": "standard && tape test/*.js"
   }
 }
